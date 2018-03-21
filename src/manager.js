@@ -1,3 +1,5 @@
+import { error } from "util";
+
 /* vim: set softtabstop=2 shiftwidth=2 expandtab : */
 
 var setUp = false
@@ -42,22 +44,25 @@ export const load = (urlParams, loadCn) => {
     // This is to support more esoteric means of loading Google Maps,
     // such as Google for business
     // https://developers.google.com/maps/documentation/javascript/get-api-key#premium-auth    
+    if (typeof (urlParams !== 'object'))
+      throw new Error("load must be typeof object")
+    else {
+      let baseUrl = 'https://maps.googleapis.com/'
 
-    let baseUrl = 'https://maps.googleapis.com/'
+      if (typeof loadCn === 'boolean' && loadCn === true) {
+        baseUrl = 'http://maps.google.cn/'
+      }
 
-    if (typeof loadCn === 'boolean' && loadCn === true) {
-      baseUrl = 'http://maps.google.cn/'
+      let url = baseUrl + 'maps/api/js?' +
+        Object.keys(urlParams)
+          .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(options[key]))
+          .join('&')
+
+      googleMapScript.setAttribute('src', url)
+      googleMapScript.setAttribute('async', '')
+      googleMapScript.setAttribute('defer', '')
+      document.head.appendChild(googleMapScript)
     }
-
-    let url = baseUrl + 'maps/api/js?' +
-      Object.keys(urlParams)
-        .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(options[key]))
-        .join('&')   
-
-    googleMapScript.setAttribute('src', url)
-    googleMapScript.setAttribute('async', '')
-    googleMapScript.setAttribute('defer', '')
-    document.head.appendChild(googleMapScript)
   } else {
     throw new Error('You already started the loading of google maps')
   }
