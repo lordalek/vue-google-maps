@@ -54,7 +54,7 @@ export const load = (urlParams, loadCn) => {
         baseUrl = 'http://maps.google.cn/';
       }
 
-      let url = baseUrl + 'maps/api/js?' + Object.keys(urlParams).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(options[key])).join('&');
+      let url = baseUrl + 'maps/api/js?' + Object.keys(urlParams).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(urlParams[key])).join('&');
 
       googleMapScript.setAttribute('src', url);
       googleMapScript.setAttribute('async', '');

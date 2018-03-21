@@ -58,7 +58,7 @@ export const load = (urlParams, loadCn) => {
 
       let url = baseUrl + 'maps/api/js?' +
         Object.keys(urlParams)
-          .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(options[key]))
+          .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(urlParams[key]))
           .join('&')
 
       googleMapScript.setAttribute('src', url)
