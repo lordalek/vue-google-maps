@@ -45,7 +45,7 @@ export const load = (urlParams, loadCn) => {
     // This is to support more esoteric means of loading Google Maps,
     // such as Google for business
     // https://developers.google.com/maps/documentation/javascript/get-api-key#premium-auth    
-    if (typeof (urlParams !== 'object')) throw new Error("load must be typeof object");else {
+    if (typeof urlParams !== 'object') throw new Error("load must be typeof object");else {
       options['callback'] = 'vueGoogleMapsInit';
 
       let baseUrl = 'https://maps.googleapis.com/';
