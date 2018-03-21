@@ -1,36 +1,14 @@
-'use strict';
+import omit from 'lodash/omit';
+import clone from 'lodash/clone';
+import propsBinder from '../utils/propsBinder.js';
+import eventsBinder from '../utils/eventsBinder.js';
+import MapElementMixin from './mapElementMixin';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _omit = require('lodash/omit');
-
-var _omit2 = _interopRequireDefault(_omit);
-
-var _clone = require('lodash/clone');
-
-var _clone2 = _interopRequireDefault(_clone);
-
-var _propsBinder = require('../utils/propsBinder.js');
-
-var _propsBinder2 = _interopRequireDefault(_propsBinder);
-
-var _eventsBinder = require('../utils/eventsBinder.js');
-
-var _eventsBinder2 = _interopRequireDefault(_eventsBinder);
-
-var _mapElementMixin = require('./mapElementMixin');
-
-var _mapElementMixin2 = _interopRequireDefault(_mapElementMixin);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var props = {
+const props = {
   options: {
     type: Object,
     required: false,
-    default: function _default() {
+    default() {
       return {};
     }
   },
@@ -48,29 +26,29 @@ var props = {
   }
 };
 
-var events = ['domready', 'closeclick', 'content_changed'];
+const events = ['domready', 'closeclick', 'content_changed'];
 
-exports.default = {
-  mixins: [_mapElementMixin2.default],
+export default {
+  mixins: [MapElementMixin],
   replace: false,
   props: props,
 
-  mounted: function mounted() {
-    var el = this.$refs.flyaway;
+  mounted() {
+    const el = this.$refs.flyaway;
     el.parentNode.removeChild(el);
   },
-  deferredReady: function deferredReady() {
+
+  deferredReady() {
     this.$markerObject = null;
-    this.$markerComponent = this.$findAncestor(function (ans) {
-      return ans.$markerObject;
-    });
+    this.$markerComponent = this.$findAncestor(ans => ans.$markerObject);
 
     if (this.$markerComponent) {
       this.$markerObject = this.$markerComponent.$markerObject;
     }
     this.createInfoWindow();
   },
-  destroyed: function destroyed() {
+
+  destroyed() {
     if (this.disconnect) {
       this.disconnect();
     }
@@ -79,9 +57,8 @@ exports.default = {
     }
   },
 
-
   methods: {
-    openInfoWindow: function openInfoWindow() {
+    openInfoWindow() {
       if (this.opened) {
         if (this.$markerObject !== null) {
           this.$infoWindow.open(this.$map, this.$markerObject);
@@ -92,11 +69,10 @@ exports.default = {
         this.$infoWindow.close();
       }
     },
-    createInfoWindow: function createInfoWindow() {
-      var _this = this;
 
+    createInfoWindow() {
       // setting options
-      var options = (0, _clone2.default)(this.options);
+      const options = clone(this.options);
       options.content = this.$refs.flyaway;
 
       // only set the position if the info window is not bound to a marker
@@ -107,12 +83,12 @@ exports.default = {
       this.$infoWindow = new google.maps.InfoWindow(options);
 
       // Binding
-      (0, _propsBinder2.default)(this, this.$infoWindow, (0, _omit2.default)(props, ['opened']));
-      (0, _eventsBinder2.default)(this, this.$infoWindow, events);
+      propsBinder(this, this.$infoWindow, omit(props, ['opened']));
+      eventsBinder(this, this.$infoWindow, events);
 
       this.openInfoWindow();
-      this.$watch('opened', function () {
-        _this.openInfoWindow();
+      this.$watch('opened', () => {
+        this.openInfoWindow();
       });
     }
   }

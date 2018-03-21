@@ -1,32 +1,10 @@
-'use strict';
+import mapValues from 'lodash/mapValues';
+import eventsBinder from '../utils/eventsBinder.js';
+import propsBinder from '../utils/propsBinder.js';
+import getPropsValuesMixin from '../utils/getPropsValuesMixin.js';
+import MapElementMixin from './mapElementMixin';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _mapValues = require('lodash/mapValues');
-
-var _mapValues2 = _interopRequireDefault(_mapValues);
-
-var _eventsBinder = require('../utils/eventsBinder.js');
-
-var _eventsBinder2 = _interopRequireDefault(_eventsBinder);
-
-var _propsBinder = require('../utils/propsBinder.js');
-
-var _propsBinder2 = _interopRequireDefault(_propsBinder);
-
-var _getPropsValuesMixin = require('../utils/getPropsValuesMixin.js');
-
-var _getPropsValuesMixin2 = _interopRequireDefault(_getPropsValuesMixin);
-
-var _mapElementMixin = require('./mapElementMixin');
-
-var _mapElementMixin2 = _interopRequireDefault(_mapElementMixin);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var props = {
+const props = {
   animation: {
     twoWay: true,
     type: Number
@@ -84,7 +62,7 @@ var props = {
   }
 };
 
-var events = ['click', 'rightclick', 'dblclick', 'drag', 'dragstart', 'dragend', 'mouseup', 'mousedown', 'mouseover', 'mouseout'];
+const events = ['click', 'rightclick', 'dblclick', 'drag', 'dragstart', 'dragend', 'mouseup', 'mousedown', 'mouseover', 'mouseout'];
 
 /**
  * @class Marker
@@ -98,11 +76,11 @@ var events = ['click', 'rightclick', 'dblclick', 'drag', 'dragstart', 'dragend',
  * reasons. Otherwise we should use a cluster-marker mixin or
  * subclass.
  */
-exports.default = {
-  mixins: [_mapElementMixin2.default, _getPropsValuesMixin2.default],
+export default {
+  mixins: [MapElementMixin, getPropsValuesMixin],
   props: props,
 
-  render: function render(h) {
+  render(h) {
     if (!this.$slots.default || this.$slots.default.length === 0) {
       return '';
     } else if (this.$slots.default.length === 1) {
@@ -112,7 +90,8 @@ exports.default = {
       return h('div', this.$slots.default);
     }
   },
-  destroyed: function destroyed() {
+
+  destroyed() {
     if (!this.$markerObject) {
       return;
     }
@@ -123,31 +102,25 @@ exports.default = {
       this.$markerObject.setMap(null);
     }
   },
-  deferredReady: function deferredReady() {
-    var _this = this;
 
-    var options = (0, _mapValues2.default)(props, function (value, prop) {
-      return _this[prop];
-    });
+  deferredReady() {
+    const options = mapValues(props, (value, prop) => this[prop]);
     options.map = this.$map;
     delete options.options;
     Object.assign(options, this.options);
 
     // search ancestors for cluster object
-    var search = this.$findAncestor(function (ans) {
-      return ans.$clusterObject;
-    });
+    let search = this.$findAncestor(ans => ans.$clusterObject);
 
     this.$clusterObject = search ? search.$clusterObject : null;
     this.createMarker(options);
   },
 
-
   methods: {
-    createMarker: function createMarker(options) {
+    createMarker(options) {
       this.$markerObject = new google.maps.Marker(options);
-      (0, _propsBinder2.default)(this, this.$markerObject, props);
-      (0, _eventsBinder2.default)(this, this.$markerObject, events);
+      propsBinder(this, this.$markerObject, props);
+      eventsBinder(this, this.$markerObject, events);
 
       if (this.$clusterObject) {
         this.$clusterObject.addMarker(this.$markerObject);

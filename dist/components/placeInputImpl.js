@@ -1,34 +1,11 @@
-'use strict';
+import omit from 'lodash/omit';
+import clone from 'lodash/clone';
+import propsBinder from '../utils/propsBinder.js';
+import downArrowSimulator from '../utils/simulateArrowDown.js';
+import getPropsValuesMixin from '../utils/getPropsValuesMixin.js';
+import { loaded } from '../manager.js';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _omit = require('lodash/omit');
-
-var _omit2 = _interopRequireDefault(_omit);
-
-var _clone = require('lodash/clone');
-
-var _clone2 = _interopRequireDefault(_clone);
-
-var _propsBinder = require('../utils/propsBinder.js');
-
-var _propsBinder2 = _interopRequireDefault(_propsBinder);
-
-var _simulateArrowDown = require('../utils/simulateArrowDown.js');
-
-var _simulateArrowDown2 = _interopRequireDefault(_simulateArrowDown);
-
-var _getPropsValuesMixin = require('../utils/getPropsValuesMixin.js');
-
-var _getPropsValuesMixin2 = _interopRequireDefault(_getPropsValuesMixin);
-
-var _manager = require('../manager.js');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var props = {
+const props = {
   bounds: {
     type: Object
   },
@@ -42,7 +19,7 @@ var props = {
   },
   types: {
     type: Array,
-    default: function _default() {
+    default: function () {
       return [];
     }
   },
@@ -66,41 +43,38 @@ var props = {
   }
 };
 
-exports.default = {
-  mixins: [_getPropsValuesMixin2.default],
+export default {
+  mixins: [getPropsValuesMixin],
 
-  mounted: function mounted() {
-    var _this = this;
-
-    var input = this.$refs.input;
+  mounted() {
+    const input = this.$refs.input;
 
     // Allow default place to be set
     input.value = this.defaultPlace;
-    this.$watch('defaultPlace', function () {
-      input.value = _this.defaultPlace;
+    this.$watch('defaultPlace', () => {
+      input.value = this.defaultPlace;
     });
 
-    _manager.loaded.then(function () {
-      var options = (0, _clone2.default)(_this.getPropsValues());
-      if (_this.selectFirstOnEnter) {
-        (0, _simulateArrowDown2.default)(_this.$refs.input);
+    loaded.then(() => {
+      const options = clone(this.getPropsValues());
+      if (this.selectFirstOnEnter) {
+        downArrowSimulator(this.$refs.input);
       }
 
       if (typeof google.maps.places.Autocomplete !== 'function') {
         throw new Error('google.maps.places.Autocomplete is undefined. Did you add \'places\' to libraries when loading Google Maps?');
       }
 
-      _this.autoCompleter = new google.maps.places.Autocomplete(_this.$refs.input, options);
-      (0, _propsBinder2.default)(_this, _this.autoCompleter, (0, _omit2.default)(props, ['placeholder', 'place', 'selectFirstOnEnter', 'defaultPlace', 'className', 'label']));
+      this.autoCompleter = new google.maps.places.Autocomplete(this.$refs.input, options);
+      propsBinder(this, this.autoCompleter, omit(props, ['placeholder', 'place', 'selectFirstOnEnter', 'defaultPlace', 'className', 'label']));
 
-      _this.autoCompleter.addListener('place_changed', function () {
-        _this.$emit('place_changed', _this.autoCompleter.getPlace());
+      this.autoCompleter.addListener('place_changed', () => {
+        this.$emit('place_changed', this.autoCompleter.getPlace());
       });
     });
   },
-  created: function created() {
+  created() {
     console.warn('The PlaceInput class is deprecated! Please consider using the Autocomplete input instead'); // eslint-disable-line no-console
   },
-
   props: props
 };

@@ -1,32 +1,11 @@
-'use strict';
+import clone from 'lodash/clone';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+import eventBinder from '../utils/eventsBinder.js';
+import propsBinder from '../utils/propsBinder.js';
+import MapElementMixin from './mapElementMixin';
+import getPropsValuesMixin from '../utils/getPropsValuesMixin.js';
 
-var _clone = require('lodash/clone');
-
-var _clone2 = _interopRequireDefault(_clone);
-
-var _eventsBinder = require('../utils/eventsBinder.js');
-
-var _eventsBinder2 = _interopRequireDefault(_eventsBinder);
-
-var _propsBinder = require('../utils/propsBinder.js');
-
-var _propsBinder2 = _interopRequireDefault(_propsBinder);
-
-var _mapElementMixin = require('./mapElementMixin');
-
-var _mapElementMixin2 = _interopRequireDefault(_mapElementMixin);
-
-var _getPropsValuesMixin = require('../utils/getPropsValuesMixin.js');
-
-var _getPropsValuesMixin2 = _interopRequireDefault(_getPropsValuesMixin);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var props = {
+const props = {
   bounds: {
     type: Object,
     twoWay: true
@@ -45,31 +24,32 @@ var props = {
   }
 };
 
-var events = ['click', 'dblclick', 'drag', 'dragend', 'dragstart', 'mousedown', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'rightclick'];
+const events = ['click', 'dblclick', 'drag', 'dragend', 'dragstart', 'mousedown', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'rightclick'];
 
-exports.default = {
-  mixins: [_mapElementMixin2.default, _getPropsValuesMixin2.default],
+export default {
+  mixins: [MapElementMixin, getPropsValuesMixin],
   props: props,
 
-  render: function render() {
+  render() {
     return '';
   },
-  deferredReady: function deferredReady() {
-    var options = (0, _clone2.default)(this.getPropsValues());
+
+  deferredReady() {
+    const options = clone(this.getPropsValues());
     options.map = this.$map;
     this.createRectangle(options);
   },
 
-
   methods: {
-    createRectangle: function createRectangle(options) {
+    createRectangle(options) {
       this.$rectangleObject = new google.maps.Rectangle(options);
-      (0, _propsBinder2.default)(this, this.$rectangleObject, props);
-      (0, _eventsBinder2.default)(this, this.$rectangleObject, events);
+      propsBinder(this, this.$rectangleObject, props);
+      eventBinder(this, this.$rectangleObject, events);
     }
+
   },
 
-  destroyed: function destroyed() {
+  destroyed() {
     if (this.$rectangleObject) {
       this.$rectangleObject.setMap(null);
     }

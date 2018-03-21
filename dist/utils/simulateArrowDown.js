@@ -1,13 +1,7 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 // This piece of code was orignally written by amirnissim and can be seen here
 // http://stackoverflow.com/a/11703018/2694653
 // This has been ported to Vanilla.js by GuillaumeLeclerc
-exports.default = function (input) {
+export default (input => {
   var _addEventListener = input.addEventListener ? input.addEventListener : input.attachEvent;
 
   function addEventListenerWrapper(type, listener) {
@@ -15,7 +9,7 @@ exports.default = function (input) {
     // and then trigger the original listener.
     if (type === 'keydown') {
       var origListener = listener;
-      listener = function listener(event) {
+      listener = function (event) {
         var suggestionSelected = document.getElementsByClassName('pac-item-selected').length > 0;
         if (event.which === 13 && !suggestionSelected) {
           var simulatedEvent = document.createEvent('Event');
@@ -31,4 +25,4 @@ exports.default = function (input) {
 
   input.addEventListener = addEventListenerWrapper;
   input.attachEvent = addEventListenerWrapper;
-};
+});

@@ -1,8 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 /*
 Mixin for objects that are mounted by Google Maps
 Javascript API.
@@ -12,15 +7,16 @@ operations so it exposes a property which accepts a bus
 
 */
 
-exports.default = {
+export default {
   props: ['resizeBus'],
 
-  data: function data() {
+  data() {
     return {
       _actualResizeBus: null
     };
   },
-  created: function created() {
+
+  created() {
     if (typeof this.resizeBus === 'undefined') {
       this.$data._actualResizeBus = this.$gmapDefaultResizeBus;
     } else {
@@ -28,26 +24,21 @@ exports.default = {
     }
   },
 
-
   methods: {
-    _resizeCallback: function _resizeCallback() {
+    _resizeCallback() {
       this.resize();
     },
-    _delayedResizeCallback: function _delayedResizeCallback() {
-      var _this = this;
-
-      this.$nextTick(function () {
-        return _this._resizeCallback();
-      });
+    _delayedResizeCallback() {
+      this.$nextTick(() => this._resizeCallback());
     }
   },
 
   watch: {
-    resizeBus: function resizeBus(newVal, oldVal) {
+    resizeBus(newVal, oldVal) {
       // eslint-disable-line no-unused-vars
       this.$data._actualResizeBus = newVal;
     },
-    '$data._actualResizeBus': function $data_actualResizeBus(newVal, oldVal) {
+    '$data._actualResizeBus'(newVal, oldVal) {
       if (oldVal) {
         oldVal.$off('resize', this._delayedResizeCallback);
       }
@@ -57,7 +48,7 @@ exports.default = {
     }
   },
 
-  destroyed: function destroyed() {
+  destroyed() {
     if (this.$data._actualResizeBus) {
       this.$data._actualResizeBus.$off('resize', this._delayedResizeCallback);
     }

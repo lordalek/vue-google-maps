@@ -1,9 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = TwoWayBindingWrapper;
 /**
  * When you have two-way bindings, but the actual bound value will not equal
  * the value you initially passed in, then to avoid an infinite loop you
@@ -43,14 +37,12 @@ new TwoWayBindingWrapper((increment, decrement, shouldUpdate) => {
   })
 })
  */
-function TwoWayBindingWrapper(fn) {
-  var counter = 0;
+export default function TwoWayBindingWrapper(fn) {
+  let counter = 0;
 
-  fn(function () {
+  fn(() => {
     counter += 1;
-  }, function () {
+  }, () => {
     counter = Math.max(0, counter - 1);
-  }, function () {
-    return counter === 0;
-  });
+  }, () => counter === 0);
 }

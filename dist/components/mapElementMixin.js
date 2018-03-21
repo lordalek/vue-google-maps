@@ -1,10 +1,6 @@
-'use strict';
+/* vim: set softtabstop=2 shiftwidth=2 expandtab : */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _deferredReady = require('../utils/deferredReady');
+import { DeferredReadyMixin } from '../utils/deferredReady';
 
 /**
  * @class MapElementMixin @mixins DeferredReadyMixin
@@ -15,24 +11,20 @@ var _deferredReady = require('../utils/deferredReady');
  *
  *
  * */
-exports.default = {
+export default {
 
-  mixins: [_deferredReady.DeferredReadyMixin],
+  mixins: [DeferredReadyMixin],
 
-  created: function created() {
-    var _this = this;
-
+  created() {
     /* Search for the Map component in the parent */
-    var search = this.$findAncestor(function (ans) {
-      return ans.$mapCreated;
-    });
+    let search = this.$findAncestor(ans => ans.$mapCreated);
 
     if (!search) {
-      throw new Error(this.constructor.name + ' component must be used within a <Map>');
+      throw new Error(`${this.constructor.name} component must be used within a <Map>`);
     }
 
-    this.$mapPromise = search.$mapCreated.then(function (map) {
-      _this.$map = map;
+    this.$mapPromise = search.$mapCreated.then(map => {
+      this.$map = map;
     });
     // FIXME: This is a hack to ensure correct loading
     // when the map has already be instantiated.
@@ -42,14 +34,14 @@ exports.default = {
     this.$MapElementMixin = search;
     this.$map = null;
   },
-  beforeDeferredReady: function beforeDeferredReady() {
+
+  beforeDeferredReady() {
     return this.$mapPromise;
   },
 
-
   methods: {
-    $findAncestor: function $findAncestor(condition) {
-      var search = this.$parent;
+    $findAncestor(condition) {
+      let search = this.$parent;
 
       while (search) {
         if (condition(search)) {
@@ -61,4 +53,4 @@ exports.default = {
     }
   }
 
-}; /* vim: set softtabstop=2 shiftwidth=2 expandtab : */
+};

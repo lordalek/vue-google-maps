@@ -1,36 +1,22 @@
-'use strict';
+/* vim: set softtabstop=2 shiftwidth=2 expandtab : */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _forIn = require('lodash/forIn');
-
-var _forIn2 = _interopRequireDefault(_forIn);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+import forIn from 'lodash/forIn';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
-} /* vim: set softtabstop=2 shiftwidth=2 expandtab : */
+}
 
-exports.default = function (vueElement, googleMapsElement, props, options) {
+export default ((vueElement, googleMapsElement, props, options) => {
   options = options || {};
-  var _options = options,
-      afterModelChanged = _options.afterModelChanged;
-
-  (0, _forIn2.default)(props, function (_ref, attribute) {
-    var twoWay = _ref.twoWay,
-        type = _ref.type,
-        trackProperties = _ref.trackProperties;
-
-    var setMethodName = 'set' + capitalizeFirstLetter(attribute);
-    var getMethodName = 'get' + capitalizeFirstLetter(attribute);
-    var eventName = attribute.toLowerCase() + '_changed';
-    var initialValue = vueElement[attribute];
+  var { afterModelChanged } = options;
+  forIn(props, ({ twoWay, type, trackProperties }, attribute) => {
+    const setMethodName = 'set' + capitalizeFirstLetter(attribute);
+    const getMethodName = 'get' + capitalizeFirstLetter(attribute);
+    const eventName = attribute.toLowerCase() + '_changed';
+    const initialValue = vueElement[attribute];
 
     if (typeof googleMapsElement[setMethodName] === 'undefined') {
-      throw new Error(setMethodName + ' is not a method of (the Maps object corresponding to) ' + vueElement.$options._componentTag);
+      throw new Error(`${setMethodName} is not a method of (the Maps object corresponding to) ${vueElement.$options._componentTag}`);
     }
 
     // We need to avoid an endless
@@ -39,8 +25,8 @@ exports.default = function (vueElement, googleMapsElement, props, options) {
     var timesSet = 0;
     if (type !== Object || !trackProperties) {
       // Track the object deeply
-      vueElement.$watch(attribute, function () {
-        var attributeValue = vueElement[attribute];
+      vueElement.$watch(attribute, () => {
+        const attributeValue = vueElement[attribute];
 
         timesSet++;
         googleMapsElement[setMethodName](attributeValue);
@@ -55,18 +41,18 @@ exports.default = function (vueElement, googleMapsElement, props, options) {
       // I can watch multiple properties, but the danger is that each of
       // them triggers the event handler multiple times
       // This ensures that the event handler will only be fired once
-      var tick = 0;
-      var expectedTick = 0;
+      let tick = 0;
+      let expectedTick = 0;
 
-      var raiseExpectation = function raiseExpectation() {
+      const raiseExpectation = () => {
         expectedTick += 1;
       };
 
-      var updateTick = function updateTick() {
+      const updateTick = () => {
         tick = Math.max(expectedTick, tick + 1);
       };
 
-      var respondToChange = function respondToChange() {
+      const respondToChange = () => {
         if (tick < expectedTick) {
           googleMapsElement[setMethodName](vueElement[attribute]);
 
@@ -78,9 +64,9 @@ exports.default = function (vueElement, googleMapsElement, props, options) {
         }
       };
 
-      trackProperties.forEach(function (propName) {
+      trackProperties.forEach(propName => {
         // When any props change -- assume they change on the same tick
-        vueElement.$watch(attribute + '.' + propName, function () {
+        vueElement.$watch(`${attribute}.${propName}`, () => {
           raiseExpectation();
           vueElement.$nextTick(respondToChange);
         }, {
@@ -90,7 +76,7 @@ exports.default = function (vueElement, googleMapsElement, props, options) {
     }
 
     if (twoWay) {
-      googleMapsElement.addListener(eventName, function (ev) {
+      googleMapsElement.addListener(eventName, ev => {
         // eslint-disable-line no-unused-vars
         /* Check for type === Object because we're quite happy
           when primitive types change -- the change detection is cheap
@@ -103,4 +89,4 @@ exports.default = function (vueElement, googleMapsElement, props, options) {
       });
     }
   });
-};
+});
