@@ -11,14 +11,7 @@ export const loaded = new Promise((resolve, reject) => { // eslint-disable-line 
 })
 
 /**
- * @param apiKey    API Key, or object with the URL parameters. For example
- *                  to use Google Maps Premium API, pass
- *                    `{ client: <YOUR-CLIENT-ID> }`.
- *                  You may pass the libraries and/or version (as `v`) parameter into
- *                  this parameter and skip the next two parameters
- * @param version   Google for Maps version
- * @param libraries Libraries to load (@see
- *                  https://developers.google.com/maps/documentation/javascript/libraries)
+ * @param urlParams query params added to google api url
  * @param loadCn    Boolean. If set to true, the map will be loaded form goole maps China
  *                  (@see https://developers.google.com/maps/documentation/javascript/basics#GoogleMapsChina)
  *
@@ -26,11 +19,10 @@ export const loaded = new Promise((resolve, reject) => { // eslint-disable-line 
  * ```
  *      import {load} from 'vue-google-maps'
  *
- *      load(<YOUR-API-KEY>)
- *
+ *     
  *      load({
- *              key: <YOUR-API-KEY>,
- *      })
+ *              key: <YOUR-API-KEY>,              
+ *      }, loadCn: true)
  *
  *      load({
  *              client: <YOUR-CLIENT-ID>,
@@ -38,7 +30,7 @@ export const loaded = new Promise((resolve, reject) => { // eslint-disable-line 
  *      })
  * ```
  */
-export const load = (apiKey, version, libraries, loadCn) => {
+export const load = (urlParams, loadCn) => {
   if (typeof document === 'undefined') {
     // Do nothing if run from server-side
     return
@@ -49,27 +41,7 @@ export const load = (apiKey, version, libraries, loadCn) => {
     // Allow apiKey to be an object.
     // This is to support more esoteric means of loading Google Maps,
     // such as Google for business
-    // https://developers.google.com/maps/documentation/javascript/get-api-key#premium-auth
-    var options = {}
-    if (typeof apiKey === 'string') {
-      options.key = apiKey
-    } else if (typeof apiKey === 'object') {
-      for (let k in apiKey) { // transfer values in apiKey to options
-        options[k] = apiKey[k]
-      }
-    } else {
-      throw new Error('apiKey should either be a string or an object')
-    }
-
-    // libraries
-    let librariesPath = ''
-    if (libraries && libraries.length > 0) {
-      librariesPath = libraries.join(',')
-      options['libraries'] = librariesPath
-    } else if (Array.prototype.isPrototypeOf(options.libraries)) {
-      options.libraries = options.libraries.join(',')
-    }
-    options['callback'] = 'vueGoogleMapsInit'
+    // https://developers.google.com/maps/documentation/javascript/get-api-key#premium-auth    
 
     let baseUrl = 'https://maps.googleapis.com/'
 
@@ -78,13 +50,9 @@ export const load = (apiKey, version, libraries, loadCn) => {
     }
 
     let url = baseUrl + 'maps/api/js?' +
-      Object.keys(options)
+      Object.keys(urlParams)
         .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(options[key]))
-        .join('&')
-
-    if (version) {
-      url = url + '&v=' + version
-    }
+        .join('&')   
 
     googleMapScript.setAttribute('src', url)
     googleMapScript.setAttribute('async', '')

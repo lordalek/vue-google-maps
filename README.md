@@ -28,7 +28,8 @@ Vue.use(VueGoogleMaps, {
     // OR: libraries: 'places,drawing'
     // OR: libraries: 'places,drawing,visualization'
     // (as you require)
-  }
+  },
+  loadCn: true //Loads google maps from http://maps.google.cn
 })
 ```
 
