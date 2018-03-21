@@ -47,7 +47,7 @@ export const load = (urlParams, loadCn) => {
     if (typeof urlParams !== 'object')
       throw new Error("load must be typeof object")
     else {
-      options['callback'] = 'vueGoogleMapsInit'
+      urlParams['callback'] = 'vueGoogleMapsInit'
 
 
       let baseUrl = 'https://maps.googleapis.com/'
