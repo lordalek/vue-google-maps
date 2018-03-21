@@ -1,9 +1,9 @@
 {
   "name": "vue2-google-maps",
   "version": "0.0.0",
+   "main": "dist/main.js",
   "dependencies": {
    "babel-runtime": "^5.8.0",
     "marker-clusterer-plus": "^2.1.4" 
-  },
-  "main": "dist/main.js",
+  } 
 }
